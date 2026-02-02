@@ -44,12 +44,12 @@ export const metadata: Metadata = {
     creator: "@Jean612", // Tu usuario si tienes
   },
 
-  // Iconos
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png", // Opcional si la creas
-  },
+  // // Iconos
+  // icons: {
+  //   icon: "/favicon.ico",
+  //   shortcut: "/favicon.ico",
+  //   apple: "/apple-touch-icon.png", // Opcional si la creas
+  // },
   
   robots: {
     index: true,
