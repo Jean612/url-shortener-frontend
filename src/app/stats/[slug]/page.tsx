@@ -59,9 +59,9 @@ export default async function StatsPage({ params }: { params: Promise<{ slug: st
           <Link href="/" className="inline-flex items-center text-sm text-slate-500 hover:text-blue-600 transition-colors mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" /> Volver al acortador
           </Link>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 items-start">
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Estadísticas</h1>
-            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm w-fit">
                 <span className="text-xs font-semibold text-slate-400 uppercase">Slug:</span>
                 <span className="text-sm font-mono font-medium text-blue-600">{link.slug}</span>
             </div>
