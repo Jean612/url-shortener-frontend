@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers"; // <--- Importante
+import { Providers } from "@/components/providers";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "URL Shortener",
-  description: "Shorten your links efficiently",
+  description: "Acortador de enlaces profesional",
 };
 
 export default function RootLayout({
@@ -16,9 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {/* Envolvemos todo con Providers */}
+    <html lang="es">
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <Providers>{children}</Providers>
       </body>
     </html>
