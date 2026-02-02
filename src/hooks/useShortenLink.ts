@@ -12,6 +12,7 @@ interface CreateLinkResponse {
       id: string;
       shortUrl: string;
       originalUrl: string;
+      slug: string;
     } | null;
     errors: string[];
   };

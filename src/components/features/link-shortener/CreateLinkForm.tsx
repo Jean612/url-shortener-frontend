@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link2, ArrowRight, Loader2, Copy, Check, Sparkles } from 'lucide-react';
+import { Link2, ArrowRight, Loader2, Copy, Check, Sparkles, BarChart3 } from 'lucide-react';
 import { useShortenLink } from '@/hooks/useShortenLink';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
 
 // Esquema de validación
 const schema = z.object({
@@ -19,6 +20,7 @@ type FormData = z.infer<typeof schema>;
 export function CreateLinkForm() {
     const [copied, setCopied] = useState(false);
     const [lastShortLink, setLastShortLink] = useState<string | null>(null);
+    const [lastSlug, setLastSlug] = useState<string | null>(null);
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
         resolver: zodResolver(schema),
@@ -32,6 +34,7 @@ export function CreateLinkForm() {
             onSuccess: (newLink) => {
                 if (newLink?.shortUrl) {
                     setLastShortLink(newLink.shortUrl);
+                    setLastSlug(newLink.slug);
                     reset();
                 }
             }
@@ -123,23 +126,36 @@ export function CreateLinkForm() {
                             </div>
                         </div>
 
-                        <Button
-                            onClick={copyToClipboard}
-                            className={`shrink-0 h-12 px-6 rounded-xl font-medium transition-all duration-300 ${copied
+                        <div className="flex items-center gap-2 shrink-0"> {/* Agregado items-center y shrink-0 */}
+                            <Button
+                                onClick={copyToClipboard}
+                                className={`h-12 px-6 rounded-xl font-medium transition-all duration-300 ${copied
                                     ? 'bg-green-100 text-green-700 hover:bg-green-200 border-transparent'
                                     : 'bg-slate-900 text-white hover:bg-slate-800'
-                                }`}
-                        >
-                            {copied ? (
-                                <span className="flex items-center gap-2">
-                                    <Check className="h-5 w-5" /> Copiado
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-2">
-                                    <Copy className="h-4 w-4" /> Copiar
-                                </span>
-                            )}
-                        </Button>
+                                    }`}
+                            >
+                                {copied ? (
+                                    <span className="flex items-center gap-2">
+                                        <Check className="h-5 w-5" /> Copiado
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        <Copy className="h-4 w-4" /> Copiar
+                                    </span>
+                                )}
+                            </Button>
+
+                            <Link href={`/stats/${lastSlug}`} target="_blank"> {/* Usamos lastSlug que ya guardaste */}
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-12 w-12 rounded-xl border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all"
+                                    title="Ver Estadísticas"
+                                >
+                                    <BarChart3 className="h-5 w-5" />
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             )}
