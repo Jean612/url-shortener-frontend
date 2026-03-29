@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link2, ArrowRight, Loader2, Copy, Check, Sparkles, BarChart3 } from 'lucide-react';
+import { useRollbar } from '@rollbar/react';
 import { useShortenLink } from '@/hooks/useShortenLink';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function CreateLinkForm() {
+    const rollbar = useRollbar();
     const [copied, setCopied] = useState(false);
     const [lastShortLink, setLastShortLink] = useState<string | null>(null);
     const [lastSlug, setLastSlug] = useState<string | null>(null);
@@ -41,11 +43,15 @@ export function CreateLinkForm() {
         });
     };
 
-    const copyToClipboard = () => {
+    const copyToClipboard = async () => {
         if (lastShortLink) {
-            navigator.clipboard.writeText(lastShortLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            try {
+                await navigator.clipboard.writeText(lastShortLink);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (e) {
+                rollbar.error('Error al copiar link al portapapeles', e as Error, { url: lastShortLink });
+            }
         }
     };
 

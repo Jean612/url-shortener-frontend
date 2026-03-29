@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRollbar } from '@rollbar/react';
 import { graphqlClient } from '@/lib/graphql/client';
 import { CREATE_LINK_MUTATION } from '@/lib/graphql/mutations/links';
 
@@ -20,6 +21,7 @@ interface CreateLinkResponse {
 
 export function useShortenLink() {
   const queryClient = useQueryClient();
+  const rollbar = useRollbar();
 
   return useMutation({
     mutationFn: async (input: CreateLinkInput) => {
@@ -27,7 +29,7 @@ export function useShortenLink() {
         CREATE_LINK_MUTATION,
         input
       );
-      
+
       // Si Rails devuelve errores en el array 'errors', lanzamos una excepción
       if (data.createLink.errors && data.createLink.errors.length > 0) {
         throw new Error(data.createLink.errors.join(', '));
@@ -38,6 +40,11 @@ export function useShortenLink() {
     onSuccess: () => {
       // Cuando se crea un link exitosamente, refrescamos la lista de abajo automáticamente
       queryClient.invalidateQueries({ queryKey: ['GetTopLinks'] });
+    },
+    onError: (error, variables) => {
+      rollbar.error('Error al crear link corto', error, {
+        originalUrl: variables.originalUrl,
+      });
     },
   });
 }

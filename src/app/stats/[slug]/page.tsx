@@ -1,5 +1,6 @@
 import { graphqlClient } from '@/lib/graphql/client';
 import { GET_LINK_STATS } from '@/lib/graphql/queries/getLinkStats';
+import { serverInstance } from '@/rollbar';
 import Link from 'next/link';
 import { BarChart3, Globe, Clock, ArrowLeft, MousePointer2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +36,7 @@ export default async function StatsPage({ params }: { params: Promise<{ slug: st
     const data = await graphqlClient.request<{ link: LinkStats }>(GET_LINK_STATS, { slug });
     link = data.link;
   } catch (e) {
-    console.error("Error fetching stats:", e);
+    serverInstance.error('Error al obtener estadísticas del link', e as Error, { slug });
     error = "No encontramos este enlace.";
   }
 
