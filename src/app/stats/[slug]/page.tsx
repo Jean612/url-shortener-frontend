@@ -35,6 +35,10 @@ export default async function StatsPage({ params }: { params: Promise<{ slug: st
   try {
     const data = await graphqlClient.request<{ link: LinkStats }>(GET_LINK_STATS, { slug });
     link = data.link;
+    if (!link) {
+      serverInstance.warning('Link no encontrado en la base de datos', { slug });
+      error = "No encontramos este enlace.";
+    }
   } catch (e) {
     serverInstance.error('Error al obtener estadísticas del link', e as Error, { slug });
     error = "No encontramos este enlace.";
