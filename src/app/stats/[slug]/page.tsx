@@ -1,8 +1,12 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { useRollbar } from '@rollbar/react';
 import { graphqlClient } from '@/lib/graphql/client';
 import { GET_LINK_STATS } from '@/lib/graphql/queries/getLinkStats';
-import { serverInstance } from '@/rollbar';
 import Link from 'next/link';
-import { BarChart3, Globe, Clock, ArrowLeft, MousePointer2 } from 'lucide-react';
+import { BarChart3, Globe, Clock, ArrowLeft, MousePointer2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Click {
@@ -22,29 +26,35 @@ interface LinkStats {
   clicks: Click[];
 }
 
-// CORRECCIÓN 1: Tipamos params como Promise
-export default async function StatsPage({ params }: { params: Promise<{ slug: string }> }) {
-  
-  // CORRECCIÓN 2: Hacemos await de params antes de usarlos
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+export default function StatsPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const rollbar = useRollbar();
 
-  let link: LinkStats | null = null;
-  let error = null;
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['LinkStats', slug],
+    queryFn: async () => {
+      const result = await graphqlClient.request<{ link: LinkStats }>(GET_LINK_STATS, { slug });
+      if (!result.link) {
+        rollbar.warning('Link no encontrado en la base de datos', { slug });
+      }
+      return result.link;
+    },
+    retry: false,
+  });
 
-  try {
-    const data = await graphqlClient.request<{ link: LinkStats }>(GET_LINK_STATS, { slug });
-    link = data.link;
-    if (!link) {
-      serverInstance.warning('Link no encontrado en la base de datos', { slug });
-      error = "No encontramos este enlace.";
-    }
-  } catch (e) {
-    serverInstance.error('Error al obtener estadísticas del link', e as Error, { slug });
-    error = "No encontramos este enlace.";
+  if (error) {
+    rollbar.error('Error al obtener estadísticas del link', error as Error, { slug });
   }
 
-  if (error || !link) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-center px-4">
         <h1 className="text-3xl font-bold text-slate-800 mb-2">Enlace no encontrado 🕵️‍♂️</h1>
@@ -55,6 +65,8 @@ export default async function StatsPage({ params }: { params: Promise<{ slug: st
       </div>
     );
   }
+
+  const link = data;
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 md:p-12">
