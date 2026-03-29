@@ -23,7 +23,7 @@ interface LinkStats {
   slug: string;
   clicksCount: number;
   createdAt: string;
-  clicks: Click[];
+  clicks: { nodes: Click[] };
 }
 
 export default function StatsPage() {
@@ -138,7 +138,7 @@ export default function StatsPage() {
                 </CardTitle>
             </CardHeader>
             <div className="p-0">
-                {link.clicks && link.clicks.length > 0 ? (
+                {link.clicks?.nodes && link.clicks.nodes.length > 0 ? (
                     <div className="relative w-full overflow-auto">
                         <table className="w-full caption-bottom text-sm text-left">
                             <thead className="[&_tr]:border-b">
@@ -149,7 +149,7 @@ export default function StatsPage() {
                                 </tr>
                             </thead>
                             <tbody className="[&_tr:last-child]:border-0">
-                                {link.clicks.map((click) => (
+                                {link.clicks.nodes.map((click) => (
                                     <tr key={click.id} className="border-b border-slate-100 transition-colors hover:bg-slate-50">
                                         <td className="p-6 align-middle font-medium">
                                             {click.country ? (

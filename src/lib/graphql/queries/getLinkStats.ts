@@ -10,10 +10,12 @@ export const GET_LINK_STATS = gql`
       clicksCount
       createdAt
       clicks {
-        id
-        country
-        userAgent
-        createdAt
+        nodes {
+          id
+          country
+          userAgent
+          createdAt
+        }
       }
     }
   }
